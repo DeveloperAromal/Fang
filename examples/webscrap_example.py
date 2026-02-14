@@ -1,4 +1,4 @@
-from fang.modules.scrapper import WebScraper
+from fang.modules.basic.web_scrapper import WebScraper
 
 
 
