@@ -49,6 +49,28 @@ class TechFingerprint:
                 self.data["meta"].append(meta.get("content"))
     
     
+    def _detect_frontend(self):
+        
+        soup = self.scrapper.soup
+        
+        if not soup:
+            return
+        
+        scripts = soup.find_all("script", src=True)
+        
+        for script in scripts:
+            
+            src = script["src"].lower()
+            
+            if "react" in src:
+                self.data["frontend"].append("React")
+                
+            if "vue" in src:
+                self.data["frontend"].append("Vue")
+
+            if "angular" in src:
+                self.data["frontend"].append("Angular")
+    
     def fingerprint(self):
         
         self.scrapper.fetch_page()
@@ -59,5 +81,6 @@ class TechFingerprint:
         
         self._detect_backend()
         self._detect_meta()
+        self._detect_frontend()
         
         return self.data
