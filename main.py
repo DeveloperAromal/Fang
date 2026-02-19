@@ -3,8 +3,8 @@ from fang.modules.web.basic.subdomain_enumerator import SubdomainEnumerator
 from fang.modules.web.basic.tech_fingerprint import TechFingerprint
 from fang.modules.web.basic.robots_parser import RobotsParser
 from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOSINT
-
-banner()
+from fang.modules.web.osint.domain_details import DomainDetails
+banner()    
 
 # SubdomainEnumerator("https://www.steyp.com").scan()
 
@@ -18,8 +18,11 @@ banner()
 
 # print(rp)
 
-osint = SocialMediaDataOSINT("https://www.steyp.com/").osint()
+# osint = SocialMediaDataOSINT("https://www.steyp.com/").osint()
 
-print(osint)
+# print(osint)
 
 
+d = DomainDetails("https://steyp.com")
+result = d.scan()
+print(result)
