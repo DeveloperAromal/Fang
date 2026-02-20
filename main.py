@@ -4,6 +4,7 @@ from fang.modules.web.basic.tech_fingerprint import TechFingerprint
 from fang.modules.web.basic.robots_parser import RobotsParser
 from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOSINT
 from fang.modules.web.osint.domain_details import DomainDetails
+from fang.modules.network.port_scanner import PortScanner
 banner()    
 
 # SubdomainEnumerator("https://www.steyp.com").scan()
@@ -23,6 +24,12 @@ banner()
 # print(osint)
 
 
-d = DomainDetails("https://steyp.com")
-result = d.scan()
+# d = DomainDetails("https://steyp.com")
+# result = d.scan()
+# print(result)
+
+po = PortScanner("https://steyp.com")
+
+result = po.scan()
+
 print(result)
