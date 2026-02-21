@@ -1,4 +1,6 @@
 import socket
+from pathlib import Path
+import json
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
@@ -8,6 +10,9 @@ class PortScanner():
         self.url = url
         
         self.open_ports = []
+        self.service_map = self._load_ports()
+        self.ports = list(map(int, self.service_map.keys()))
+
         
     
     def _get_host(self):
@@ -19,6 +24,23 @@ class PortScanner():
     
     def _resolve_ip(self, host):
         return socket.gethostbyname(host)
+    
+    
+    
+    def _load_ports(self):
+        
+        BASE_DIR = Path(__file__).resolve().parents[2]
+        DIR_PATH =  BASE_DIR / "data" / "ports.json"
+
+        with open(DIR_PATH, "r") as f:
+            return json.load(f)
+    
+    
+    
+    def _find_service(self, port: int):
+        return self.service_map.get(str(port), "unknown")
+
+    
     
     def _scan_port(self, ip, port):
         
@@ -42,12 +64,28 @@ class PortScanner():
         host = self._get_host()
         ip = self._resolve_ip(host)
             
-        ports = [21,22,23,25,53,80,110,143,443,445,3306,3389,5432,6379,8080]
-            
+
         with ThreadPoolExecutor(max_workers=50) as executor:
                 
-            results = executor.map(lambda p: self._scan_port(ip, p), ports)
-                
-            self.open_ports = [p for p in results if p]
+            results = executor.map(lambda p: self._scan_port(ip, p), self.ports)
+        
+        open_ports = [p for p in results if p]
             
-            return self.open_ports
+        enriched = [
+            {
+                "port": port,
+                "service": self._find_service(port)
+            }
+            
+            for port in open_ports
+        ]       
+            
+            
+        return {
+                    "host": host,
+                    "ip": ip,
+                    "total_scanned": len(self.ports),
+                    "open_ports_count": len(enriched),
+                    "open_ports": enriched
+               }
+        
