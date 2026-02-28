@@ -5,6 +5,7 @@ from fang.modules.web.basic.robots_parser import RobotsParser
 from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOSINT
 from fang.modules.web.osint.domain_details import DomainDetails
 from fang.modules.network.port_scanner import PortScanner
+from fang.modules.web.basic.url_crawler import URLCrawler
 banner()    
 
 # SubdomainEnumerator("https://www.steyp.com").scan()
@@ -28,8 +29,16 @@ banner()
 # result = d.scan()
 # print(result)
 
-po = PortScanner("https://steyp.com")
+# po = PortScanner("https://vidyatcklmr.ac.in/")
 
-result = po.scan()
+# result = po.scan()
 
-print(result)
+# print(result)
+
+
+
+# ur = URLCrawler("https://vidyatcklmr.ac.in/")
+
+# result = ur.crawl()
+
+# print(result)
