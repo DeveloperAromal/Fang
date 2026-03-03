@@ -79,8 +79,7 @@ class PortScanner():
             
             for port in open_ports
         ]       
-            
-            
+
         return {
                     "host": host,
                     "ip": ip,
