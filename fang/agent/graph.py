@@ -14,6 +14,7 @@ from .tools import (
     domain_details,
     social_media_osint
 )
+from .prompt.agent_prompt import SYSTEM_PROMPT
 
 load_dotenv()
 
@@ -40,19 +41,7 @@ def build_graph():
     agent = create_react_agent(
         llm,
         tools,
-        prompt = """
-            You are an autonomous cybersecurity reconnaissance agent.
-
-When given a target:
-1. First enumerate subdomains.
-2. Then scan open ports.
-3. Then crawl URLs.
-4. Then fingerprint technologies.
-5. Then collect OSINT data.
-
-Do not ask the user what to do.
-Start executing immediately using available tools.
-        """
+        prompt = SYSTEM_PROMPT
     )
 
     return agent
