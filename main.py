@@ -6,7 +6,6 @@ from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOS
 from fang.modules.web.osint.domain_details import DomainDetails
 from fang.modules.network.port_scanner import PortScanner
 from fang.modules.web.basic.url_crawler import URLCrawler
-banner()    
 
 # SubdomainEnumerator("https://www.steyp.com").scan()
 
@@ -42,3 +41,18 @@ banner()
 # result = ur.crawl()
 
 # print(result)
+
+
+from fang.agent.graph import build_graph
+
+if __name__ == "__main__":
+
+    app = build_graph()
+
+    result = app.invoke({
+        "messages": [
+            ("user", "Perform reconnaissance on https://vidyatcklmr.ac.in")
+        ]
+    })
+
+    print(result)
