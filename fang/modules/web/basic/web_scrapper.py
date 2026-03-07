@@ -75,14 +75,12 @@ class WebScraper:
             self.fetch_page()
 
         if not self.html:
-            print("HTML is None")
             return []
 
         if not self.soup:
             self.parse_page()
 
         if not self.soup:
-            print("Soup is None")
             return []
 
         return [a["href"] for a in self.soup.find_all("a", href=True)]

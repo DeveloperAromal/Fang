@@ -56,5 +56,4 @@ class Executor:
     def run(self):
         
         self._tools()
-        print("\n" + "="*20 + " Scan Memory " + "="*20)
         print(STORAGE)

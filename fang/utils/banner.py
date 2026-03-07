@@ -1,6 +1,10 @@
 from colorama import Fore, Style, init #type: ignore
+from .ip_data import IPData
 
 init(autoreset=True)
+
+ip_v4 = IPData.ipv4()
+ip_v6 = IPData.ipv6()
 
 
 def banner():
