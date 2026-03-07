@@ -12,11 +12,33 @@ class URLCrawler:
         self.visited = set()
         self.to_visit = [url]
 
+
+    def _is_same_domain(self, netloc: str):
+            netloc = netloc.lower()
+            return netloc == self.base_domain or netloc.endswith("." + self.base_domain)
+
+
+
+
     def _normalize_link(self, base, link):
         try:
-            return urljoin(base, link)
+            absolute = urljoin(base, link)
+            absolute = self._clean_url(absolute)
+
+            parsed = urlparse(absolute)
+
+            if not self._is_same_domain(parsed.netloc):
+                return None
+
+            if parsed.scheme not in ("http", "https"):
+                return None
+
+            return absolute
+
         except Exception:
             return None
+
+
 
     def crawl(self, max_pages=50):
         while self.to_visit and len(self.visited) < max_pages:
@@ -29,7 +51,6 @@ class URLCrawler:
                 res = requests.get(current_url, timeout=10)
 
                 if res.status_code in (200, 201):
-                    print(f"Crawling: {current_url}")
                     self.visited.add(current_url)
 
                     scraper = WebScraper(current_url)
@@ -37,10 +58,10 @@ class URLCrawler:
 
                     for link in links:
                         normalized = self._normalize_link(current_url, link)
+                        
                         if not normalized:
                             continue
 
-                        # only crawl same netloc to avoid going off-site
                         if urlparse(normalized).netloc != self.start_netloc:
                             continue
 

@@ -50,10 +50,7 @@ class SubdomainEnumerator:
 
                 if res.status_code == 200 or res.status_code == 201:
                     
-                    found_subdomains.append(domain)
-
-                    print(f"[+] Found ({len(found_subdomains)}) {domain}")
-                    
+                    found_subdomains.append(domain)                    
                         
                         
             except requests.exceptions.RequestException as e:
