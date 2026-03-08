@@ -1,5 +1,6 @@
 import socket
 from urllib.parse import urlparse
+import ssl
 
 
 class CaptureBanner:
@@ -15,13 +16,47 @@ class CaptureBanner:
     def grab(self) -> dict:
         try:
             with socket.create_connection((self.host, self.port), timeout=5) as sock:
-                banner = sock.recv(2048)
+                sock.settimeout(5)
+
+                # Use SSL wrap for HTTPS ports
+                if self.port == 443:
+                    try:
+                        ctx = ssl.create_default_context()
+                        ctx.check_hostname = False
+                        ctx.verify_mode = ssl.CERT_NONE
+                        with ctx.wrap_socket(sock, server_hostname=self.host) as ssock:
+                            try:
+                                ssock.sendall(b"GET / HTTP/1.0\r\nHost: %b\r\n\r\n" % self.host.encode())
+                            except Exception:
+                                pass
+                            banner = ssock.recv(4096)
+                    except Exception:
+                        pass
+                    
+                    
+                elif self.port in (80, 8080):
+                    try:
+                        req = f"GET / HTTP/1.0\r\nHost: {self.host}\r\n\r\n".encode()
+                        sock.sendall(req)
+                    except Exception:
+                        pass
+
+                    try:
+                        banner = sock.recv(4096)
+                    except socket.timeout:
+                        banner = b""
+
+                else:
+                    try:
+                        banner = sock.recv(2048)
+                    except socket.timeout:
+                        banner = b""
 
             result = {
                 "host": self.host,
                 "port": self.port,
                 "raw_banner": banner,
-                "decoded_banner": banner.decode(errors="ignore"),
+                "decoded_banner": banner.decode(errors="ignore") if banner else "",
             }
 
             service_info = self._detect_service(banner)

@@ -2,6 +2,7 @@ from colorama import Fore, Style, init  # type: ignore
 from .ip_data import IPData
 from datetime import datetime
 import shutil, re
+from config.settings import VERSION
 
 init(autoreset=True)
 
@@ -34,16 +35,16 @@ def banner():
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ipv6_str = ip_v6 if ip_v6 else "N/A"
 
-    print()
+    print("")
     for line in ASCII_LINES:
         print(BRIGHT + LR + line + RESET)
-    print()
+    print("")
     print(hline())
     print(fill(
-        f"  {DIM+C}Version {RESET}{BRIGHT+LW}2.0.0{RESET}  {DIM+C}Author {RESET}{BRIGHT+LW}YourName{RESET}  {DIM+C}Status {RESET}{BRIGHT+G}● ACTIVE{RESET}",
+        f"  {DIM+C}Version {RESET}{BRIGHT+LW}{VERSION}{RESET}  {DIM+C}Author {RESET}{BRIGHT+LW}YourName{RESET}  {DIM+C}Status {RESET}{BRIGHT+G}● ACTIVE{RESET}",
         f"{DIM+C}IPv4 {RESET}{BRIGHT+LW}{ip_v4}{RESET}  {DIM+C}IPv6 {RESET}{BRIGHT+LW}{ipv6_str}  {RESET}"
     ))
     print(hline())
-    print(f"  {BRIGHT+LR}⚠  {DIM+Y}Authorized use only. All requests exit from {BRIGHT+LW}{ip_v4}{DIM+Y}. Devs hold NO liability.{RESET}")
+    print(f"  {BRIGHT+LR} {DIM+Y}Authorized use only. All requests exit from {BRIGHT+LW}{ip_v4}{DIM+Y}. Devs hold NO liability.{RESET}")
     print(hline())
-    print()
+    print("")
