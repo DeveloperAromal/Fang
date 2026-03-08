@@ -1,6 +1,11 @@
 
 import requests
+from requests.exceptions import SSLError
+import urllib3
 from fang.modules.web.basic.web_scrapper import WebScraper
+
+# suppress insecure request warnings when verify=False is used
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class RobotsParser:
     
@@ -21,16 +26,18 @@ class RobotsParser:
     def _has_robot(self):
         
         url = f"{self.url}/robots.txt"
-        
-        res = requests.get(url, timeout = 10)
-        
-        if res.status_code in (200, 201):
-            
-            return True
-        
-        else:
-            
+        try:
+            res = requests.get(url, timeout=10)
+        except SSLError:
+            # retry without verification if certificate is invalid for the host
+            try:
+                res = requests.get(url, timeout=10, verify=False)
+            except Exception:
+                return False
+        except requests.RequestException:
             return False
+
+        return res.status_code in (200, 201)
         
         
     def _extract_robots(self):
@@ -40,8 +47,11 @@ class RobotsParser:
             url = f"{self.url}/robots.txt"
              
             try:
-                
-                robots = requests.get(url).text     
+                try:
+                    robots = requests.get(url, timeout=10).text
+                except SSLError:
+                    robots = requests.get(url, timeout=10, verify=False).text
+
                 lines = robots.splitlines()
                 
                 for line in lines:

@@ -1,5 +1,6 @@
 import re
 from fang.modules.web.basic.web_scrapper import WebScraper
+from fang.utils.logger import Logger
 
 class SocialMediaDataOSINT:
     
@@ -21,7 +22,7 @@ class SocialMediaDataOSINT:
     
     def _get_all_links(self):
         links = self.scraper.get_all_links()
-        print(links)
+        Logger.info(links)
         return links
         
         

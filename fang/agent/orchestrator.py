@@ -1,59 +1,82 @@
-from fang.modules.network.port_scanner import PortScanner
-from fang.modules.network.capture_banner import CaptureBanner
-from fang.modules.web.basic.robots_parser import RobotsParser
-from fang.modules.web.basic.subdomain_enumerator import SubdomainEnumerator
-from fang.modules.web.basic.tech_fingerprint import TechFingerprint
-from fang.modules.web.basic.url_crawler import URLCrawler
-from fang.modules.web.basic.web_scrapper import WebScraper
-from fang.modules.web.osint.domain_details import DomainDetails
-from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOSINT
-
+from .planner.planner import Planner
+from config.settings import TOOLS_AVAILABLE
 from fang.memory.storage import STORAGE
+from fang.utils.logger import Logger
+from typing import List
+import traceback
 
-class Executor:
 
-    def __init__(self, target: str):
+TOOLS_BY_NAME = {tool["name"]: tool for tool in TOOLS_AVAILABLE}
+
+class Orchestrator:
+    
+    def __init__(self, usr_prompt: str, target: str):
+        self.usr_prompt = usr_prompt
         self.target = target
-        self.scraper = WebScraper(target)
-        self.port_scanner = PortScanner(target)
-        self.robots = RobotsParser(target)
-        self.subdomain_enum = SubdomainEnumerator(target)
-        self.tech_fingerprint = TechFingerprint(target)
-        self.url_mapper = URLCrawler(target)
-        self.domain_details = DomainDetails(target)
-        self.socialmedia_osint = SocialMediaDataOSINT(target)
-
-    def _banner_grab(self):
-        scan_result = STORAGE.get("port_scan", {})
-        open_ports = [p['port'] for p in scan_result.get("open_ports", [])]
-
-        banners = {}
-        for port in open_ports:
+        
+    
+    def _plan(self):
+        return Planner(self.usr_prompt).plan().json()
+    
+    
+    def _resolve_order(self, selected: List[str]) -> List[str]:
+        
+        ordered = list(selected)
+        
+        for tool_name in selected:
+            
+            tool = TOOLS_BY_NAME.get(tool_name, {})
+            dep = tool.get("depends_on")
+            
+            if dep and dep in ordered:
+                
+                dep_idx = ordered.index(dep)
+                tool_idx = ordered.index(tool_name)
+                
+                if tool_idx < dep_idx:
+                    ordered.remove(tool_name)
+                    ordered.insert(dep_idx + 1, tool_name)
+                    
+        return ordered
+        
+    
+    def _run_tool(self, tools: List[str]) -> None:
+        
+        tools = self._resolve_order(tools)
+            
+        
+        for tool_name in tools:
+            tool = TOOLS_BY_NAME.get(tool_name)
+            
+            if not tool:
+                continue
+            
+                Logger.info(f"{tool_name}...")
             try:
-                banners[port] = CaptureBanner(scan_result['host'], port).grab()
+                result = tool["executor"](self.target, STORAGE)
+
+                STORAGE[tool["storage_key"]] = result
+                Logger.success(f"{tool_name} completed")
+
             except Exception as e:
-                banners[port] = {"error": str(e)}
+                Logger.error(f"{tool_name} failed: {e}")
+                Logger.error(traceback.format_exc())
+    
+    
+    def orchestrate(self,  plan: dict):
+        
+        self._run_tool(plan.get("selected_tools", []))
+        
+        Logger.info("Recon complete. Findings:")
+        
+        for key in STORAGE:
+              Logger.result(key, STORAGE[key])
 
-        STORAGE["banners"] = banners
-        return banners
-
-
-    def _tools(self):
-        """Call each tool and store results in STORAGE"""
-        
-        STORAGE["port_scan"] = self.port_scanner.scan()
-        STORAGE["robots_txt"] = self.robots.parse()
-        STORAGE["subdomains"] = self.subdomain_enum.scan()
-        STORAGE["tech_fingerprint"] = self.tech_fingerprint.fingerprint()
-        # STORAGE["url_map"] = self.url_mapper.crawl()
-        STORAGE["web_scrape"] = self.scraper.get_html()
-        STORAGE["domain_details"] = self.domain_details.scan()
-        # STORAGE["social_media_osint"] = self.socialmedia_osint.osint()
-        STORAGE["banners"] = self._banner_grab()
-        
-        
-        
-    def run(self):
-        
-        self._tools()
-        print(STORAGE)
+        return {
+            "target":    self.target,
+            "objective": plan.get("objective", ""),
+            "findings":  dict(STORAGE),
+        }
+    
+    
+    
