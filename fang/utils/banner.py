@@ -41,7 +41,7 @@ def banner():
     print("")
     print(hline())
     print(fill(
-        f"  {DIM+C}Version {RESET}{BRIGHT+LW}{VERSION}{RESET}  {DIM+C}Author {RESET}{BRIGHT+LW}YourName{RESET}  {DIM+C}Status {RESET}{BRIGHT+G}● ACTIVE{RESET}",
+        f"  {DIM+C}Version {RESET}{BRIGHT+LW}{VERSION}{RESET}  {DIM+C}Author {RESET}{BRIGHT+LW}Aromal{RESET}  {DIM+C}Status {RESET}{BRIGHT+G}● ACTIVE{RESET}",
         f"{DIM+C}IPv4 {RESET}{BRIGHT+LW}{ip_v4}{RESET}  {DIM+C}IPv6 {RESET}{BRIGHT+LW}{ipv6_str}  {RESET}"
     ))
     print(hline())

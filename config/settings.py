@@ -15,9 +15,9 @@ VERSION = "1.0.0"
 
 LLM_PROVIDER = ""         
 LLM_API_KEY = ""              
-LLM_MODEL = ""   
+LLM_MODEL = "gemini-2.5-flash"   
 LLM_MAX_TOKENS = 4096
-LLM_BASE_URL = ""
+LLM_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 
 TOOLS_AVAILABLE = [
     {
@@ -30,7 +30,7 @@ TOOLS_AVAILABLE = [
         "name": "grab_banners",
         "description": "Grab banners from open ports to identify running services and versions. Requires port scan to run first.",
         "storage_key": "banners",
-        "executor": None,  # replaced with a named function below
+        "executor": None, 
         "depends_on": "scan_ports",
     },
     {
@@ -124,7 +124,7 @@ MAX_CRAWL_PAGES = 50
 RESPECT_ROBOTS_TXT = False          
 
 
-REPORT_OUTPUT_DIR = "reports/"
+REPORT_OUTPUT_DIR = "/report/data"
 REPORT_FORMAT = "markdown"         
 REPORT_INCLUDE_RAW_DATA = False     
 

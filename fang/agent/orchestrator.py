@@ -51,7 +51,8 @@ class Orchestrator:
             if not tool:
                 continue
             
-                Logger.info(f"{tool_name}...")
+            Logger.info(f"{tool_name}...")
+            
             try:
                 result = tool["executor"](self.target, STORAGE)
 
@@ -68,9 +69,7 @@ class Orchestrator:
         self._run_tool(plan.get("selected_tools", []))
         
         Logger.info("Recon complete. Findings:")
-        
-        for key in STORAGE:
-              Logger.result(key, STORAGE[key])
+
 
         return {
             "target":    self.target,
