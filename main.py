@@ -1,9 +1,11 @@
 from fang.agent.orchestrator import Orchestrator
 from fang.utils.banner import banner
-from fang.utils.ip_data import IPData
 from fang.utils.prompt_fn import PromptUser
 from fang.agent.planner.planner import Planner
+from fang.report.analyser import Analyzer
+from fang.report.report_generator import ReportGenerator
 from fang.utils.logger import Logger
+
 import json
 
 
@@ -13,12 +15,17 @@ banner()
 while True:
 
     p = PromptUser("> ").collect()
-    
+
     if p.lower() in ("exit", "quit", "q"):
         break
 
     plan = json.loads(Planner(p).plan())
+    target = plan.get("target_url", "")
 
-    target = plan["target_url"]
-    Logger.result("recon", Orchestrator(p, target).orchestrate(plan))
-    
+    Logger.info(f"Target: {target}")
+
+    recon = Orchestrator(p, target).orchestrate(plan)
+
+    analysis = Analyzer(recon["findings"]).analyze()
+
+    ReportGenerator(analysis, target).generate()
