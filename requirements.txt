@@ -1,0 +1,6 @@
+langchain-openai
+colorama
+requests
+beautifulsoup4
+dnspython
+python-whois
