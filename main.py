@@ -5,6 +5,7 @@ from fang.agent.planner.planner import Planner
 from fang.report.analyser import Analyzer
 from fang.report.report_generator import ReportGenerator
 from fang.utils.logger import Logger
+from fang.utils.memory_filter import MemoryFilter
 
 import json
 
@@ -13,9 +14,9 @@ banner()
 
 
 while True:
-
+    print("\n")
     p = PromptUser("> ").collect()
-
+    
     if p.lower() in ("exit", "quit", "q"):
         break
 
@@ -24,8 +25,4 @@ while True:
 
     Logger.info(f"Target: {target}")
 
-    recon = Orchestrator(p, target).orchestrate(plan)
-
-    analysis = Analyzer(recon["findings"]).analyze()
-
-    ReportGenerator(analysis, target).generate()
+    Orchestrator(p, target).orchestrate(plan)

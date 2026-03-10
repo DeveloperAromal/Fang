@@ -2,6 +2,10 @@ from .planner.planner import Planner
 from config.settings import TOOLS_AVAILABLE
 from fang.memory.storage import STORAGE
 from fang.utils.logger import Logger
+from fang.utils.memory_filter import MemoryFilter
+from fang.report.analyser import Analyzer
+from fang.report.report_generator import ReportGenerator
+
 from typing import List
 import traceback
 
@@ -70,12 +74,10 @@ class Orchestrator:
         
         Logger.info("Recon complete. Findings:")
 
+        memory_filter = MemoryFilter()
+        filterd = memory_filter(dict(STORAGE))
+        
+        analysis = Analyzer(filterd).analyze()
 
-        return {
-            "target":    self.target,
-            "objective": plan.get("objective", ""),
-            "findings":  dict(STORAGE),
-        }
-    
-    
+        ReportGenerator(analysis, self.target).generate()
     

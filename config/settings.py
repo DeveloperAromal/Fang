@@ -124,7 +124,7 @@ MAX_CRAWL_PAGES = 50
 RESPECT_ROBOTS_TXT = False          
 
 
-REPORT_OUTPUT_DIR = "/report/data"
+REPORT_OUTPUT_DIR = "generated"
 REPORT_FORMAT = "markdown"         
 REPORT_INCLUDE_RAW_DATA = False     
 
