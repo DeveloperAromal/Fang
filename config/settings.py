@@ -11,7 +11,7 @@ from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOS
 
 VERSION = "1.0.0"
 
-
+IS_NEW = False
 
 LLM_PROVIDER = ""         
 LLM_API_KEY = ""              
