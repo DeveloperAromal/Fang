@@ -6,17 +6,22 @@ from fang.report.analyser import Analyzer
 from fang.report.report_generator import ReportGenerator
 from fang.utils.logger import Logger
 from fang.utils.memory_filter import MemoryFilter
+from fang.utils.config_helpers import ConfigHelper
 
 import json
 
 
 banner()
 
+config = ConfigHelper()
 
 while True:
-    print("\n")
+    config.check()
+
+    print()
+
     p = PromptUser("> ").collect()
-    
+
     if p.lower() in ("exit", "quit", "q"):
         break
 
