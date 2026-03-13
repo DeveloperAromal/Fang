@@ -84,23 +84,16 @@ pip install -r requirements.txt
 
 ---
 
-## Configuration
-
-Edit `config/settings.py` and fill in your LLM credentials:
-
-```python
-LLM_PROVIDER = "openai"
-LLM_API_KEY  = "your-api-key"
-LLM_MODEL    = "gpt-4o"
-LLM_BASE_URL = "https://api.openai.com/v1"
-```
-
----
 
 ## Usage
 
 ```bash
 python main.py
+```
+or
+```bash
+chmod +x fang.sh
+./fang.sh
 ```
 
 ```
@@ -114,38 +107,66 @@ Reports are saved to the `reports/` directory.
 
 ---
 
+<img src="https://github.com/DeveloperAromal/Fang/blob/main/assets/fang_scr.png" alt="scr"/>
+
 ## Project Structure
+
 
 ```
 Fang
-├── config
-│   └── settings.py           # LLM config, tool registry, scan settings
-├── fang
-│   ├── agent
-│   │   ├── orchestrator.py   # Connects planner -> tools -> analyzer
-│   │   ├── planner           # LLM-powered tool selector
-│   │   └── prompt            # All LLM prompts
-│   ├── data
-│   │   ├── ports.json
-│   │   └── subdomain_list.txt
-│   ├── memory
-│   │   └── storage.py        # In-memory findings store
-│   ├── modules
-│   │   ├── network           # Port scanner, banner grabber
-│   │   └── web
-│   │       ├── basic         # Robots, subdomains, tech, crawler, scraper
-│   │       └── osint         # Domain details, social media
-│   ├── report
-│   │   ├── analyser.py       # AI vulnerability analyzer
-│   │   └── report_generator.py
-│   └── utils
-│       ├── banner.py
-│       ├── logger.py
-│       └── ip_data.py
-├── reports                   # Generated reports saved here
-└── main.py
-```
+├─ assets
+│  └─ fang_scr.png
+├─ config
+│  └─ settings.py
+├─ docs
+├─ fang
+│  ├─ agent
+│  │  ├─ orchestrator.py
+│  │  ├─ planner
+│  │  │  └─ planner.py
+│  │  └─ prompt
+│  │     └─ agent_prompt.py
+│  ├─ data
+│  │  ├─ ports.json
+│  │  └─ subdomain_list.txt
+│  ├─ memory
+│  │  └─ storage.py
+│  ├─ modules
+│  │  ├─ network
+│  │  │  ├─ capture_banner.py
+│  │  │  └─ port_scanner.py
+│  │  └─ web
+│  │     ├─ basic
+│  │     │  ├─ robots_parser.py
+│  │     │  ├─ subdomain_enumerator.py
+│  │     │  ├─ tech_fingerprint.py
+│  │     │  ├─ url_crawler.py
+│  │     │  ├─ web_scrapper.py
+│  │     │  └─ __init__.py
+│  │     └─ osint
+│  │        ├─ domain_details.py
+│  │        └─ social_media_data_extracter.py
+│  ├─ report
+│  │  ├─ analyser.py
+│  │  ├─ report_generator.py
+│  │  └─ template
+│  │     └─ template_report.md
+│  └─ utils
+│     ├─ banner.py
+│     ├─ config_helpers.py
+│     ├─ ip_data.py
+│     ├─ json_cleaner.py
+│     ├─ logger.py
+│     ├─ memory_filter.py
+│     └─ prompt_fn.py
+├─ fang.sh
+├─ generated
+├─ LICENSE
+├─ main.py
+├─ README.md
+└─ requirements.txt
 
+```
 ---
 
 ## Disclaimer
