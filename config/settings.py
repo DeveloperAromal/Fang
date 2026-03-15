@@ -9,12 +9,12 @@ from fang.modules.web.osint.domain_details import DomainDetails
 from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOSINT
 
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
-IS_NEW = False
+IS_NEW = True
 
 LLM_PROVIDER = ""         
-LLM_API_KEY = ""              
+LLM_API_KEY = ""
 LLM_MODEL = "gemini-2.5-flash"   
 LLM_MAX_TOKENS = 4096
 LLM_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
