@@ -9,9 +9,9 @@ from fang.modules.web.osint.domain_details import DomainDetails
 from fang.modules.web.osint.social_media_data_extracter import SocialMediaDataOSINT
 
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
-IS_NEW = True
+IS_NEW = False
 
 LLM_PROVIDER = ""         
 LLM_API_KEY = ""
@@ -104,6 +104,16 @@ for t in TOOLS_AVAILABLE:
     if t.get("name") == "grab_banners":
         t["executor"] = grab_banners_executor
         break
+    
+    
+def get_api_key() -> str:
+    with open("config/settings.py", "r") as f:
+        for line in f:
+            stripped = line.strip()
+            if stripped.startswith("LLM_API_KEY") and "=" in stripped:
+                _, _, value = stripped.partition("=")
+                return value.strip().strip('"').strip("'")
+    return ""
 
 
 TARGET = ""                         

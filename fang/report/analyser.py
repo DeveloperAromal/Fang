@@ -1,9 +1,9 @@
 import json
-from config.settings import LLM_API_KEY, LLM_BASE_URL, LLM_MODEL
+from config.settings import  LLM_BASE_URL, LLM_MODEL, get_api_key
 from fang.agent.prompt.agent_prompt import ANALYZER_PROMPT
 from fang.utils.logger import Logger
 from fang.utils.json_cleaner import cleanJson
-from langchain_openai import ChatOpenAI
+from fang.utils.llm_provider import LLM
 
 
 class Analyzer:
@@ -12,24 +12,31 @@ class Analyzer:
         self.findings = findings
 
     def analyze(self) -> dict:
-
         Logger.info("Analyzing findings...")
 
         prompt = ANALYZER_PROMPT(self.findings)
-
-        llm = ChatOpenAI(
+        llm = LLM(
             model=LLM_MODEL,
-            api_key=LLM_API_KEY,
-            base_url=LLM_BASE_URL
+            api_base_url=LLM_BASE_URL,
+            api_key=get_api_key(),
         )
 
         response = llm.invoke(prompt)
 
+        if not response or not response.strip():
+            Logger.error("LLM returned an empty response")
+            return {}
+
+        cleaned = cleanJson(response)
+
+        if not cleaned:
+            Logger.error(f"cleanJson returned empty. Raw response: {repr(response)}")
+            return {}
+
         try:
-            result = json.loads(cleanJson(response.content))
+            result = json.loads(cleaned)
             Logger.success("Analysis complete")
             return result
-
-        except Exception as e:
-            Logger.error(f"Analysis failed: {e}")
+        except json.JSONDecodeError as e:
+            Logger.error(f"JSON parse failed: {e} | Cleaned: {repr(cleaned)}")
             return {}
