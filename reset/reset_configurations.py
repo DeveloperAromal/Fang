@@ -1,4 +1,5 @@
 import re
+from fang.utils.logger import Logger
 
 @staticmethod
 def config():
@@ -12,6 +13,8 @@ def config():
 
     with open(SETTINGS_PATH, "w") as f:
         f.write(content)
-        
+    
+    Logger.success("Reset completed sucessfully")
+    
         
 config()

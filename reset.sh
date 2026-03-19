@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python ./reset/reset_configurations.py
+python -m reset.reset_configurations
