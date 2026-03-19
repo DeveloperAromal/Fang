@@ -1,13 +1,9 @@
 from colorama import Fore, Style, init  # type: ignore
-from .ip_data import IPData
-from datetime import datetime
 import shutil, re
 from config.settings import VERSION
 
 init(autoreset=True)
 
-ip_v4 = IPData.ipv4()
-ip_v6 = IPData.ipv6()
 
 C=Fore.CYAN; Y=Fore.YELLOW; G=Fore.GREEN; LR=Fore.LIGHTRED_EX
 LW=Fore.LIGHTWHITE_EX; DIM=Style.DIM; RESET=Style.RESET_ALL; BRIGHT=Style.BRIGHT
@@ -40,8 +36,6 @@ REPO    = "https://github.com/DeveloperAromal/Fang"
 TAGLINE = "Autonomous Cybersecurity Reconnaissance Framework"
 
 def banner():
-    ts      = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    ipv6_str = ip_v6 if ip_v6 else "N/A"
 
     print("")
     for line in ASCII_LINES:
@@ -52,7 +46,6 @@ def banner():
     print(hline())
     print(row("Version",  VERSION))
     print(row("Author",   "Aromal"))
-    print(row("IPv4",     ip_v4))
     print(row("Repo",     REPO, LB))
     print(hline())
     print("")
