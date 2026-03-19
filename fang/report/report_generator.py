@@ -1,11 +1,11 @@
 import os
+import math
+import copy
 from datetime import datetime
 from config.settings import LLM_API_KEY, LLM_BASE_URL, LLM_MODEL, REPORT_OUTPUT_DIR
 from fang.agent.prompt.agent_prompt import REPORT_PROMPT
 from fang.utils.logger import Logger
-from langchain_openai import ChatOpenAI
-import math
-import copy
+from fang.utils.llm_provider import LLM
 
 
 class ReportGenerator:
@@ -19,10 +19,10 @@ class ReportGenerator:
         Logger.info("Generating report...")
         findings = self.data.get("findings", []) if isinstance(self.data, dict) else []
 
-        llm = ChatOpenAI(
+        llm = LLM(
             model=LLM_MODEL,
+            api_base_url=LLM_BASE_URL,
             api_key=LLM_API_KEY,
-            base_url=LLM_BASE_URL
         )
 
         CHUNK_SIZE = 10
@@ -30,8 +30,7 @@ class ReportGenerator:
         try:
             if not findings or len(findings) <= CHUNK_SIZE:
                 prompt = REPORT_PROMPT(self.data, self.target)
-                response = llm.invoke(prompt)
-                result = response.content
+                result = llm.invoke(prompt)
 
             else:
                 total = math.ceil(len(findings) / CHUNK_SIZE)
@@ -46,8 +45,7 @@ class ReportGenerator:
                 )
 
                 prompt_first = prefix_first + REPORT_PROMPT(first_chunk, self.target)
-                response_first = llm.invoke(prompt_first)
-                result_main = response_first.content
+                result_main = llm.invoke(prompt_first)
 
                 fragments = []
                 for i in range(1, total):
@@ -62,8 +60,7 @@ class ReportGenerator:
                     )
 
                     prompt_part = prefix_part + REPORT_PROMPT(chunk_data, self.target)
-                    resp = llm.invoke(prompt_part)
-                    fragments.append(resp.content)
+                    fragments.append(llm.invoke(prompt_part))
 
                 main = result_main
                 insert_after = "## Detailed Findings"
