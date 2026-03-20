@@ -21,7 +21,7 @@ class Analyzer:
             api_key=get_api_key(),
         )
 
-        response = llm.invoke(prompt)
+        response = llm.invoke(prompt, max_tokens=8192)
 
         if not response or not response.strip():
             Logger.error("LLM returned an empty response")

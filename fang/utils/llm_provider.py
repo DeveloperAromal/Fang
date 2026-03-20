@@ -12,7 +12,7 @@ class LLM:
         self,
         prompt: str,
         system_prompt: str | None = None,
-        max_tokens: int = 1024,
+        max_tokens: int = 4096,
         temperature: float = 1.0,
     ) -> str:
       
