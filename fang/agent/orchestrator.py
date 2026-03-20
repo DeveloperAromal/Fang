@@ -76,7 +76,7 @@ class Orchestrator:
 
         memory_filter = MemoryFilter()
         filterd = memory_filter(dict(STORAGE))
-        
+        print(filterd)
         analysis = Analyzer(filterd).analyze()
 
         ReportGenerator(analysis, self.target).generate()

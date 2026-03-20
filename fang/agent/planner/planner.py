@@ -29,7 +29,7 @@ class Planner:
         )
 
         response = llm.invoke(prompt)
-
+        print(response)
         try:
             return cleanJson(response)
         except Exception:
