@@ -1,1 +1,4 @@
 STORAGE = {}
+
+
+API_KEY_CACHED = []

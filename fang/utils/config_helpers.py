@@ -1,3 +1,5 @@
+from fang.memory.storage import API_KEY_CACHED
+
 class ConfigHelper:
 
     SETTINGS_PATH = "config/settings.py"
@@ -47,6 +49,7 @@ class ConfigHelper:
 
     def _add_key(self):
         key = input("Paste your Google API key (https://aistudio.google.com/api-keys): ").strip()
+        API_KEY_CACHED.append(key)
         self._write_settings({
             "LLM_API_KEY": key,
             "IS_NEW": True,
