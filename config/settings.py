@@ -113,7 +113,7 @@ def get_api_key() -> str:
             if stripped.startswith("LLM_API_KEY") and "=" in stripped:
                 _, _, value = stripped.partition("=")
                 return value.strip().strip('"').strip("'")
-    return ""
+    return value.strip().strip('"').strip("'")
 
 
 TARGET = ""                         

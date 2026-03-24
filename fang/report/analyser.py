@@ -4,6 +4,7 @@ from fang.agent.prompt.agent_prompt import ANALYZER_PROMPT
 from fang.utils.logger import Logger
 from fang.utils.json_cleaner import cleanJson
 from fang.utils.llm_provider import LLM
+from fang.memory.storage import API_KEY_CACHED
 
 
 class Analyzer:
@@ -13,12 +14,12 @@ class Analyzer:
 
     def analyze(self) -> dict:
         Logger.info("Analyzing findings...")
-
+        
         prompt = ANALYZER_PROMPT(self.findings)
         llm = LLM(
             model=LLM_MODEL,
             api_base_url=LLM_BASE_URL,
-            api_key=get_api_key(),
+            api_key= API_KEY_CACHED[0] if get_api_key() else "",
         )
 
         response = llm.invoke(prompt, max_tokens=8192)
