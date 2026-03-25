@@ -2,7 +2,7 @@ import os
 import math
 import copy
 from datetime import datetime
-from config.settings import get_api_key, LLM_BASE_URL, LLM_MODEL, REPORT_OUTPUT_DIR
+from config.settings import get_api_key, LLM_BASE_URL, LLM_MODEL, REPORT_OUTPUT_DIR, LLM_API_KEY
 from fang.agent.prompt.agent_prompt import REPORT_PROMPT
 from fang.utils.logger import Logger
 from fang.utils.llm_provider import LLM
@@ -24,7 +24,7 @@ class ReportGenerator:
         llm = LLM(
             model=LLM_MODEL,
             api_base_url=LLM_BASE_URL,
-            api_key= API_KEY_CACHED[0] if get_api_key() else "",
+            api_key= API_KEY_CACHED[0] if get_api_key() else LLM_API_KEY
         )
 
         CHUNK_SIZE = 10
