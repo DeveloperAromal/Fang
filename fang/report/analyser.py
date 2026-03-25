@@ -1,5 +1,5 @@
 import json
-from config.settings import  LLM_BASE_URL, LLM_MODEL, get_api_key
+from config.settings import  LLM_BASE_URL, LLM_MODEL, get_api_key,LLM_API_KEY
 from fang.agent.prompt.agent_prompt import ANALYZER_PROMPT
 from fang.utils.logger import Logger
 from fang.utils.json_cleaner import cleanJson
@@ -19,7 +19,7 @@ class Analyzer:
         llm = LLM(
             model=LLM_MODEL,
             api_base_url=LLM_BASE_URL,
-            api_key= API_KEY_CACHED[0] if get_api_key() else "",
+            api_key= API_KEY_CACHED[0] if get_api_key() else LLM_API_KEY,
         )
 
         response = llm.invoke(prompt, max_tokens=8192)
