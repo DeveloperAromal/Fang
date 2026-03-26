@@ -1,0 +1,173 @@
+import { Callout } from 'nextra/components'
+
+# Understanding Reports
+
+Every Fang scan produces a professional Markdown report saved to the `reports/` directory. This page explains the report structure and how to interpret each section.
+
+---
+
+## Report Location and Naming
+
+Reports are saved as:
+
+```
+reports/report_YYYYMMDD_HHMMSS.md
+```
+
+For example: `reports/report_20250309_142301.md`
+
+The timestamp reflects when the report was generated, not when the scan started.
+
+---
+
+## Report Structure
+
+A typical Fang report is organized into these sections:
+
+### 1. Header
+
+```markdown
+# Fang Reconnaissance Report
+**Target:** https://testfire.net
+**Date:** 2025-03-09 14:23:01
+**Objective:** scan testfire.net for open ports, technologies, and any potential vulnerabilities
+```
+
+Confirms the target scanned, when the scan ran, and the original objective you entered.
+
+---
+
+### 2. Executive Summary
+
+A brief paragraph written by the Analyzer summarizing the most significant findings. This is the section to read first — it distills the entire report into 3–5 sentences highlighting the highest-risk items.
+
+Example:
+```markdown
+## Executive Summary
+
+The target testfire.net is running Apache 2.2.34 on port 80, a version with a known
+critical vulnerability (CVE-2017-7679). The site exposes an admin panel at /admin and
+is built on an identifiable CMS version with public exploits available. Subdomain
+enumeration revealed a staging environment with weaker security controls.
+```
+
+---
+
+### 3. Target Information
+
+Basic facts about the target collected from `domain_details` and network scans:
+
+```markdown
+## Target Information
+
+| Field        | Value                         |
+|--------------|-------------------------------|
+| Domain       | testfire.net                  |
+| IP Address   | 65.61.137.117                 |
+| Registrar    | GoDaddy.com LLC               |
+| Hosting      | IBM                           |
+| DNS Records  | A, MX, NS, TXT                |
+```
+
+---
+
+### 4. Findings
+
+The main body of the report. Findings are organized by **severity level** from highest to lowest risk.
+
+#### Severity Levels
+
+| Level | Meaning |
+|---|---|
+| `CRITICAL` | Immediate exploitation risk. Patch or mitigate before anything else. |
+| `HIGH` | Significant risk. Likely exploitable with moderate effort. |
+| `MEDIUM` | Noteworthy risk. Exploitable under certain conditions. |
+| `LOW` | Minor risk. Low likelihood or low impact. |
+| `INFO` | Informational. No direct risk but useful context. |
+
+#### Finding Format
+
+Each finding follows this structure:
+
+```markdown
+### [CRITICAL] Apache 2.2.34 — Remote Code Execution
+
+**CVE:** CVE-2017-7679
+**Tool:** grab_banners
+**Evidence:** Apache/2.2.34 banner on port 80
+
+**Description:**
+Apache HTTP Server 2.2.34 contains a buffer overflow vulnerability in mod_mime that
+allows a remote attacker to cause a denial of service or potentially execute arbitrary code.
+
+**Remediation:**
+Upgrade Apache to version 2.4.x or later. Apply the vendor security patch if an immediate
+upgrade is not possible.
+```
+
+---
+
+### 5. Attack Surface Assessment
+
+A section where the Analyzer maps out which entry points represent the most accessible paths for an attacker. This is distinct from individual findings — it's about which combination of findings creates the highest risk.
+
+```markdown
+## Attack Surface Assessment
+
+The most accessible entry points identified are:
+
+1. The exposed /admin panel (discovered via robots.txt) combined with the outdated CMS version
+   presents a direct authenticated attack path.
+2. The staging subdomain (staging.testfire.net) runs without HTTPS and exposes a login form
+   with no rate limiting.
+3. Port 8080 is open and running an unpatched version of Tomcat.
+```
+
+---
+
+### 6. Remediation Summary
+
+A consolidated list of recommended actions, ordered by severity:
+
+```markdown
+## Remediation Summary
+
+| Priority | Action |
+|----------|--------|
+| CRITICAL | Upgrade Apache from 2.2.34 to 2.4.x |
+| HIGH     | Restrict /admin to internal IPs or add 2FA |
+| MEDIUM   | Remove staging subdomain from public DNS or add authentication |
+| LOW      | Disable directory listing on port 8080 |
+| INFO     | Remove server version disclosure from HTTP headers |
+```
+
+---
+
+## Using Reports for Bug Bounties
+
+Fang's reports are formatted to be submitted directly or with minimal editing. When submitting to a bug bounty program:
+
+- Lead with the **Executive Summary** as your vulnerability description
+- Include the relevant **Finding** section as your proof of concept
+- Reference the **CVE** number where applicable
+- Use the **Evidence** field as your reproduction steps
+
+<Callout type="info">
+  Always verify findings manually before submitting a bug bounty report. Fang's Analyzer is AI-powered and may occasionally misclassify severity or misidentify a CVE. A 5-minute manual check protects your reputation as a researcher.
+</Callout>
+
+---
+
+## Report as a Markdown File
+
+Because reports are plain Markdown, you can:
+
+- Render them in GitHub, VS Code, Obsidian, or any Markdown viewer
+- Convert to PDF using `pandoc` for client delivery
+- Import into Notion or Confluence
+- Version control them alongside your notes with Git
+
+```bash
+# Convert to PDF (requires pandoc and a LaTeX engine)
+pandoc reports/report_20250309_142301.md -o report.pdf
+```

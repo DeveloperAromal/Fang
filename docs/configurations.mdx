@@ -1,0 +1,168 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Configuration
+
+All configuration lives in `config/settings.py`. This page documents every setting and shows provider-specific examples.
+
+---
+
+## LLM Settings
+
+These four settings connect Fang to your chosen LLM provider.
+
+### `LLM_PROVIDER`
+
+**Type:** `str`
+
+Identifies the LLM provider. This tells Fang which API format and authentication scheme to use.
+
+**Accepted values:** `"openai"`, `"groq"`, `"ollama"`
+
+```python
+LLM_PROVIDER = "openai"
+```
+
+---
+
+### `LLM_API_KEY`
+
+**Type:** `str`
+
+Your API key for the LLM provider. For local providers like Ollama, this can be set to any non-empty string since no authentication is required.
+
+```python
+LLM_API_KEY = "sk-..."
+```
+
+<Callout type="warning">
+  Never commit your API key to version control. Use environment variables or a `.env` file and load them with `python-dotenv` if you're contributing to the project.
+</Callout>
+
+---
+
+### `LLM_MODEL`
+
+**Type:** `str`
+
+The specific model to use for both the Planner and Analyzer stages.
+
+```python
+LLM_MODEL = "gpt-4o"
+```
+
+See the provider-specific examples below for recommended models per provider.
+
+---
+
+### `LLM_BASE_URL`
+
+**Type:** `str`
+
+The base URL of the LLM API. For OpenAI-compatible providers, this is the root endpoint before `/chat/completions`.
+
+```python
+LLM_BASE_URL = "https://api.openai.com/v1"
+```
+
+---
+
+## Provider Examples
+
+<Tabs items={['OpenAI', 'Groq', 'Ollama']}>
+  <Tabs.Tab>
+```python
+# config/settings.py
+
+LLM_PROVIDER = "openai"
+LLM_API_KEY  = "sk-your-openai-key"
+LLM_MODEL    = "gpt-4o"          # or "gpt-4-turbo", "gpt-3.5-turbo"
+LLM_BASE_URL = "https://api.openai.com/v1"
+```
+
+**Recommended model:** `gpt-4o` gives the best planning and analysis quality. `gpt-3.5-turbo` works but may produce lower-quality tool selection and analysis.
+
+Get your key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+```python
+# config/settings.py
+
+LLM_PROVIDER = "groq"
+LLM_API_KEY  = "gsk_your-groq-key"
+LLM_MODEL    = "llama3-70b-8192"   # or "mixtral-8x7b-32768"
+LLM_BASE_URL = "https://api.groq.com/openai/v1"
+```
+
+**Recommended model:** `llama3-70b-8192`. Groq's inference is extremely fast, making it a good choice if scan speed matters more than maximum analysis depth.
+
+Get your key at [console.groq.com/keys](https://console.groq.com/keys).
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+```python
+# config/settings.py
+
+LLM_PROVIDER = "ollama"
+LLM_API_KEY  = "ollama"           # any non-empty string
+LLM_MODEL    = "llama3"           # or any model you've pulled locally
+LLM_BASE_URL = "http://localhost:11434/v1"
+```
+
+**Prerequisites:** [Install Ollama](https://ollama.com) and pull a model:
+
+```bash
+ollama pull llama3
+```
+
+**Recommended model:** `llama3` for a balance of quality and speed. `mistral` is a lighter alternative. Using Ollama keeps all data fully local — no API calls leave your machine.
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+## Tool Registry
+
+`config/settings.py` also contains a tool registry — a list of all available tools that the Planner can select from. This is how the Planner knows which tools exist and what they do.
+
+If you add a new module (see [Contributing](/contributing)), you register it here so the Planner can discover and use it.
+
+---
+
+## Scan Settings
+
+Depending on your version of Fang, `settings.py` may expose additional scan parameters:
+
+| Setting | Description |
+|---|---|
+| Port range | Which ports `scan_ports` scans. Defaults to common ports from `ports.json` |
+| Subdomain wordlist | Path to the wordlist used by `enumerate_subdomains`. Defaults to `fang/data/subdomain_list.txt` |
+| Crawl depth | How many levels deep `crawl_urls` follows links |
+| Request timeout | Timeout in seconds for HTTP requests |
+| User-Agent | The User-Agent string sent in all HTTP requests |
+
+<Callout type="info">
+  Always check your version's `config/settings.py` directly for the full, up-to-date list of settings. New options are added as modules are developed.
+</Callout>
+
+---
+
+## Using Environment Variables (Recommended)
+
+To avoid hardcoding secrets, load your API key from an environment variable:
+
+```python
+import os
+
+LLM_PROVIDER = "openai"
+LLM_API_KEY  = os.getenv("OPENAI_API_KEY", "")
+LLM_MODEL    = "gpt-4o"
+LLM_BASE_URL = "https://api.openai.com/v1"
+```
+
+Then set the variable before running:
+
+```bash
+export OPENAI_API_KEY="sk-your-key"
+python main.py
+```
