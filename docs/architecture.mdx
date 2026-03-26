@@ -1,0 +1,151 @@
+import { Callout } from 'nextra/components'
+
+# Architecture
+
+Fang is built as a five-stage AI pipeline. Each stage is a distinct component with a specific responsibility — from understanding your intent to generating a professional report.
+
+---
+
+## Pipeline Overview
+
+```
+User Prompt
+     │
+     ▼
+┌─────────────┐
+│   Planner   │  ← LLM reads your objective, selects tools, infers target, resolves order
+└──────┬──────┘
+       │
+       ▼
+┌──────────────────┐
+│   Orchestrator   │  ← Executes the tool pipeline with dependency resolution
+└──────┬───────────┘
+       │
+       ▼
+┌───────────┐
+│  Storage  │  ← Holds all raw findings in memory during the session
+└──────┬────┘
+       │
+       ▼
+┌────────────┐
+│  Analyzer  │  ← LLM reasons over findings, assigns severities, maps CVEs
+└──────┬─────┘
+       │
+       ▼
+┌──────────────────┐
+│ Report Generator │  ← Produces a professional Markdown penetration testing report
+└──────────────────┘
+```
+
+---
+
+## Stage 1 — Planner
+
+**File:** `fang/agent/planner/`
+
+The Planner is the brain of the pipeline. When you enter a prompt, the Planner (powered by your configured LLM) does three things:
+
+- **Parses intent** — understands what kind of recon you want
+- **Infers the target** — extracts the URL or domain from natural language
+- **Selects and sequences tools** — picks only the tools relevant to your objective and determines the execution order, respecting dependencies
+
+For example, `scan testfire.net for open ports and technologies` causes the Planner to select `scan_ports → grab_banners → fingerprint_tech` in that order, because banner grabbing requires a port list.
+
+The Planner uses a prompt template from `fang/agent/prompt/` to structure the LLM call. It returns a structured tool execution plan, not free-form text.
+
+---
+
+## Stage 2 — Orchestrator
+
+**File:** `fang/agent/orchestrator.py`
+
+The Orchestrator receives the Planner's execution plan and runs it. It handles:
+
+- **Sequential execution** — tools run in the order the Planner specified
+- **Dependency resolution** — a tool that depends on another tool's output (e.g. `grab_banners` depends on `scan_ports`) waits for that output before running
+- **Output forwarding** — each tool's findings are written to the in-memory Storage after it completes
+- **Status reporting** — you see `[+] tool_name completed` as each step finishes
+
+The Orchestrator is the glue between intelligence (Planner) and action (tools). It does not make decisions — it executes the plan faithfully.
+
+---
+
+## Stage 3 — Storage
+
+**File:** `fang/memory/storage.py`
+
+Storage is a simple in-memory key-value store that holds all tool outputs for the duration of a session. Each tool writes its findings here after completion. The Analyzer reads all findings from Storage at the end of the pipeline.
+
+<Callout type="info">
+  Storage is session-scoped and in-memory — it does not persist between runs. Each new scan starts with a clean slate.
+</Callout>
+
+The storage model is intentionally simple: it avoids file I/O during the pipeline, keeping execution fast, while giving the Analyzer a complete, unified view of all findings at once.
+
+---
+
+## Stage 4 — Analyzer
+
+**File:** `fang/report/analyser.py`
+
+The Analyzer is the second LLM-powered stage. It receives all raw findings from Storage and produces a structured threat assessment. Specifically, it:
+
+- **Assigns severity ratings** across four levels: `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, and `INFO`
+- **Maps CVEs** — identifies known vulnerabilities by cross-referencing service versions and technologies discovered
+- **Identifies attack surface** — highlights which findings represent the most accessible entry points
+- **Generates remediation recommendations** — actionable steps for each finding
+
+The Analyzer uses a dedicated prompt template designed to produce structured, report-ready output rather than conversational text.
+
+---
+
+## Stage 5 — Report Generator
+
+**File:** `fang/report/report_generator.py`
+
+The Report Generator takes the Analyzer's structured output and renders it as a professional Markdown penetration testing report. The report includes:
+
+- Executive summary
+- Target information
+- Findings organized by severity
+- CVE references
+- Attack surface assessment
+- Remediation recommendations
+
+Reports are saved to the `reports/` directory as timestamped `.md` files, e.g. `report_20250309_142301.md`.
+
+---
+
+## Project Structure
+
+Here's how the codebase maps to the pipeline stages:
+
+```
+Fang/
+├── config/
+│   └── settings.py             # LLM config, tool registry, scan settings
+├── fang/
+│   ├── agent/
+│   │   ├── orchestrator.py     # Stage 2 — Orchestrator
+│   │   ├── planner/            # Stage 1 — Planner (LLM-powered)
+│   │   └── prompt/             # Prompt templates for Planner and Analyzer
+│   ├── data/
+│   │   ├── ports.json          # Port list for scanner
+│   │   └── subdomain_list.txt  # Wordlist for subdomain enumeration
+│   ├── memory/
+│   │   └── storage.py          # Stage 3 — In-memory findings store
+│   ├── modules/
+│   │   ├── network/            # Port scanner, banner grabber
+│   │   └── web/
+│   │       ├── basic/          # Robots, subdomains, tech fingerprinting, crawler, scraper
+│   │       └── osint/          # Domain details, social media
+│   ├── report/
+│   │   ├── analyser.py         # Stage 4 — AI vulnerability analyzer
+│   │   └── report_generator.py # Stage 5 — Markdown report writer
+│   └── utils/
+│       ├── banner.py           # CLI banner display
+│       ├── logger.py           # Logging utilities
+│       └── ip_data.py          # IP resolution helpers
+├── reports/                    # Generated reports saved here
+└── main.py                     # Entry point
+```

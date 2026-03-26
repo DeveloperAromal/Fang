@@ -1,0 +1,85 @@
+import { Callout } from 'nextra/components'
+
+# Disclaimer
+
+<Callout type="error">
+  Fang is built for **authorized security testing only**. Using this tool against targets without explicit written permission is illegal in most jurisdictions and may result in criminal prosecution, civil liability, and permanent bans from bug bounty programs.
+</Callout>
+
+---
+
+## Authorized Use Only
+
+Fang is a professional-grade reconnaissance tool intended for:
+
+- **Bug bounty programs** — targets explicitly listed in a program's scope on platforms like HackerOne, Bugcrowd, or Intigriti
+- **Penetration testing engagements** — with a signed Statement of Work or Rules of Engagement document from the client
+- **Security research** — on systems you own, control, or have received explicit written permission to test
+- **CTF (Capture the Flag) competitions** — within the defined scope of the competition
+
+---
+
+## What "Authorized" Means
+
+Before running Fang against any target, you must have:
+
+1. **Written permission** from the system owner — verbal permission is not sufficient in most legal contexts
+2. **Defined scope** — know exactly which domains, IP ranges, and systems are in scope
+3. **Defined rules of engagement** — understand what types of testing are permitted and any time restrictions
+
+If you are participating in a bug bounty program, read the program's policy page carefully. Pay attention to:
+
+- In-scope vs out-of-scope assets
+- Prohibited testing methods (e.g. DoS, physical attacks)
+- Disclosure timelines
+- Safe harbor clauses
+
+---
+
+## Legal Context
+
+Unauthorized access to computer systems is a criminal offense in virtually every jurisdiction:
+
+| Jurisdiction | Relevant Law |
+|---|---|
+| United States | Computer Fraud and Abuse Act (CFAA) |
+| United Kingdom | Computer Misuse Act 1990 |
+| European Union | Directive on Attacks Against Information Systems |
+| India | Information Technology Act 2000 |
+| Australia | Criminal Code Act 1995, Part 10.7 |
+
+This is not an exhaustive list. Consult a legal professional if you have questions about the laws applicable to your situation.
+
+---
+
+## Responsible Disclosure
+
+If you discover a vulnerability using Fang, follow responsible disclosure practices:
+
+1. **Do not exploit** the vulnerability beyond what is necessary to confirm it exists
+2. **Document** your findings clearly and professionally
+3. **Report** to the organization through their official security disclosure channel or bug bounty program
+4. **Allow reasonable time** for the organization to patch — typically 90 days is the industry standard before public disclosure
+5. **Do not disclose publicly** until the vulnerability is patched or the disclosure window has passed
+
+---
+
+## No Warranty
+
+Fang is provided "as is" without warranty of any kind, express or implied. The authors make no representations about the suitability, reliability, availability, timeliness, or accuracy of the tool or its output for any purpose.
+
+Security research inherently carries risk. Findings produced by Fang's AI-powered Analyzer should always be **manually verified** before being treated as confirmed vulnerabilities. AI analysis can produce false positives, incorrect severity ratings, and inaccurate CVE mappings.
+
+---
+
+## Author's Position
+
+Fang was built to make authorized security testing faster and more accessible. The authors are committed to supporting the security research community and the responsible disclosure ecosystem.
+
+We explicitly condemn the use of this tool for unauthorized access, data theft, denial of service attacks, or any other malicious purpose.
+
+---
+
+<Callout type="warning">
+  **By using Fang, you accept full responsibility for ensuring that your use is lawful and authorized.** The authors and contributors are not liable for any damages, legal consequences, or other outcomes resulting from the use or misuse of this tool.
+</Callout>

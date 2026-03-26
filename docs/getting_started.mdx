@@ -1,0 +1,145 @@
+import { Steps, Callout, Tabs } from 'nextra/components'
+
+# Getting Started
+
+Get Fang installed, configured, and running your first scan in under five minutes.
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **Python 3.9+** installed on your system
+- **pip** (comes with Python)
+- An API key from a supported LLM provider (OpenAI, Groq, or a local Ollama instance)
+- Git
+
+---
+
+## Installation
+
+<Steps>
+
+### Clone the repository
+
+```bash
+git clone https://github.com/DeveloperAromal/Fang.git
+cd Fang
+```
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+This installs all required Python packages including the HTTP client, web scraping libraries, and LLM SDK dependencies.
+
+### Configure your LLM
+
+Open `config/settings.py` and fill in your credentials:
+
+```python
+LLM_PROVIDER = "openai"       # or "groq", "ollama"
+LLM_API_KEY  = "your-api-key-here"
+LLM_MODEL    = "gpt-4o"
+LLM_BASE_URL = "https://api.openai.com/v1"
+```
+
+See the [Configuration](/configuration) page for a full breakdown of every setting and provider-specific examples.
+
+### Run Fang
+
+```bash
+python main.py
+```
+
+You'll see the Fang banner and an interactive prompt:
+
+```
+  ___
+ |  _|__ _ _ __  __ _
+ | |/ _` | '_ \/ _` |
+ |_|\__,_|_| |_\__, |
+               |___/
+
+[*] Fang ready. Enter your objective below.
+>
+```
+
+### Run your first scan
+
+Type a plain English objective:
+
+```
+> scan example.com for open ports and technologies
+```
+
+Fang will plan the tool execution, run the pipeline, analyze the findings, and save a report.
+
+</Steps>
+
+---
+
+## Your First Scan — Walkthrough
+
+Here's what happens step-by-step when you enter a prompt:
+
+**1. Planner reads your objective**
+
+The LLM Planner parses your input, identifies the target URL, and selects the most relevant tools. For a prompt like `scan example.com for open ports and technologies`, it picks `scan_ports`, `grab_banners`, and `fingerprint_tech`.
+
+**2. Orchestrator runs the pipeline**
+
+Tools execute in dependency order. `grab_banners` waits for `scan_ports` to finish because it needs the open port list. You'll see live status lines:
+
+```
+[+] scan_ports completed
+[+] grab_banners completed
+[+] fingerprint_tech completed
+```
+
+**3. Analyzer reasons over findings**
+
+All raw output is passed to the LLM Analyzer, which assigns severity ratings, maps known CVEs, and identifies the attack surface.
+
+**4. Report is saved**
+
+```
+[+] Report saved -> reports/report_20250309_142301.md
+```
+
+Open the file in any Markdown viewer. See [Understanding Reports](/reports) for a guide to the report format.
+
+---
+
+## Example Prompts
+
+```
+> scan https://target.com for technologies and vulnerabilities
+> full recon on example.com
+> enumerate subdomains of target.com
+> scan testfire.net for open ports, technologies, and any potential vulnerabilities
+> check domain details and social media presence for example.com
+```
+
+---
+
+## Exiting
+
+Type `exit` at the prompt to quit:
+
+```
+> exit
+```
+
+---
+
+<Callout type="info">
+  Reports are saved in the `reports/` directory at the root of the project. Each report is timestamped, e.g. `report_20250309_142301.md`.
+</Callout>
+
+<Callout type="warning">
+  Only run Fang against targets you have **explicit written permission** to test. Unauthorized scanning is illegal in most jurisdictions.
+</Callout>

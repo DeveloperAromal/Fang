@@ -1,0 +1,192 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Tools
+
+Fang ships with nine recon tools spanning network analysis, web fingerprinting, and OSINT. The LLM Planner automatically selects and sequences these tools based on your objective — you never call them directly.
+
+---
+
+## How Tools Are Selected
+
+When you enter a prompt, the Planner reads it and decides which tools are relevant. You don't need to know tool names to use Fang effectively. However, understanding what each tool does helps you write better prompts and interpret results.
+
+---
+
+## Network Tools
+
+### `scan_ports`
+
+**Location:** `fang/modules/network/`
+
+Scans open TCP ports on the target and identifies running services. Uses the port list from `fang/data/ports.json` as its scanning range.
+
+**What it finds:**
+- Open TCP ports and their port numbers
+- Service names associated with each port (e.g. HTTP on 80, SSH on 22)
+- Basic service identification
+
+**Triggers when your prompt mentions:** open ports, port scan, services, network exposure
+
+**Output used by:** `grab_banners` (depends on this tool's port list)
+
+---
+
+### `grab_banners`
+
+**Location:** `fang/modules/network/`
+
+Connects to open ports discovered by `scan_ports` and grabs service banners. Banners often contain version strings that reveal whether a service is running outdated, vulnerable software.
+
+**What it finds:**
+- Service version strings (e.g. `OpenSSH 7.4`, `Apache/2.4.6`)
+- Software version numbers for CVE matching
+- Custom or modified banners that may reveal infrastructure details
+
+**Dependencies:** Requires `scan_ports` to run first.
+
+<Callout type="info">
+  Banner grabbing is one of the highest-value tools for CVE mapping. A version string like `Apache/2.2.34` immediately flags a known critical vulnerability.
+</Callout>
+
+---
+
+## Web Tools
+
+### `fingerprint_tech`
+
+**Location:** `fang/modules/web/basic/`
+
+Detects the technology stack powering the target web application. Identifies CMS platforms, web frameworks, server software, and JavaScript libraries by analyzing HTTP headers, HTML source, cookies, and other fingerprints.
+
+**What it finds:**
+- CMS platforms (WordPress, Drupal, Joomla)
+- Web frameworks (Django, Laravel, Rails, Express)
+- Server software (Nginx, Apache, IIS) and versions
+- Frontend libraries and JavaScript frameworks (React, jQuery, Vue)
+- CDN and cloud provider indicators
+
+**Triggers when your prompt mentions:** technologies, tech stack, frameworks, CMS, fingerprinting
+
+---
+
+### `parse_robots`
+
+**Location:** `fang/modules/web/basic/`
+
+Fetches and parses the target's `robots.txt` file. Robots.txt is frequently misused as an access control mechanism, inadvertently revealing hidden endpoints, admin panels, backup files, and internal paths.
+
+**What it finds:**
+- `Disallow` paths that hint at sensitive or hidden areas
+- Admin interfaces (e.g. `/admin`, `/wp-admin`)
+- API endpoints not linked in the main site
+- Backup or staging paths
+
+**Triggers when your prompt mentions:** robots, hidden paths, disallowed endpoints
+
+---
+
+### `crawl_urls`
+
+**Location:** `fang/modules/web/basic/`
+
+Crawls the target site by following links recursively from the root URL. Builds a complete map of all discoverable endpoints on the site.
+
+**What it finds:**
+- All linked pages and resources
+- Forms (potential injection points)
+- File upload endpoints
+- API paths exposed through the frontend
+- Interesting parameters in URLs
+
+**Triggers when your prompt mentions:** URLs, endpoints, crawl, map, site structure
+
+---
+
+### `scrape_web`
+
+**Location:** `fang/modules/web/basic/`
+
+Scrapes raw HTML from key pages and inspects it for information that may be accidentally exposed.
+
+**What it finds:**
+- HTML comments containing developer notes, credentials, or internal paths
+- Meta tags with software version information
+- Hidden form fields
+- Inline JavaScript that may expose API keys or internal logic
+- Email addresses and contact information
+
+**Triggers when your prompt mentions:** scrape, HTML, source, comments, metadata
+
+---
+
+### `enumerate_subdomains`
+
+**Location:** `fang/modules/web/basic/`
+
+Enumerates subdomains of the target domain using a wordlist-based approach. Uses `fang/data/subdomain_list.txt` as the subdomain dictionary.
+
+**What it finds:**
+- Development and staging subdomains (e.g. `dev.example.com`, `staging.example.com`)
+- Admin interfaces on separate subdomains
+- API subdomains
+- Forgotten or unmaintained subdomains running old software
+
+**Triggers when your prompt mentions:** subdomains, subdomain enumeration, full recon
+
+<Callout type="info">
+  Subdomains often run older software versions or have weaker security configurations than the main domain. They're frequently the path of least resistance.
+</Callout>
+
+---
+
+## OSINT Tools
+
+### `domain_details`
+
+**Location:** `fang/modules/web/osint/`
+
+Gathers passive intelligence about the target domain using public data sources.
+
+**What it finds:**
+- WHOIS data: registrant, registrar, registration and expiry dates
+- DNS records: A, AAAA, MX, NS, TXT, CNAME
+- IP address and hosting provider
+- Geographic location of servers
+- Historical DNS data that may reveal infrastructure changes
+
+**Triggers when your prompt mentions:** domain info, WHOIS, DNS, registrar, IP
+
+---
+
+### `social_media_osint`
+
+**Location:** `fang/modules/web/osint/`
+
+Extracts the social media presence associated with the target organization. Useful for building a broader intelligence picture of the target's public footprint.
+
+**What it finds:**
+- Linked social media profiles (Twitter/X, LinkedIn, GitHub, Facebook)
+- Employee names or handles discoverable from public profiles
+- Technology clues from job postings or GitHub repositories
+- Leaked or publicly shared internal information
+
+**Triggers when your prompt mentions:** social media, OSINT, employees, presence, footprint
+
+---
+
+## Tool Dependency Map
+
+```
+scan_ports
+    └── grab_banners (requires open port list)
+
+fingerprint_tech   ← independent
+parse_robots       ← independent
+crawl_urls         ← independent
+scrape_web         ← independent
+enumerate_subdomains ← independent
+domain_details     ← independent
+social_media_osint ← independent
+```
+
+The Orchestrator enforces the `scan_ports → grab_banners` dependency automatically. All other tools can run in any order.
