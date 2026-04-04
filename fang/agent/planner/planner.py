@@ -1,8 +1,8 @@
-from config.settings import LLM_MODEL, LLM_BASE_URL, TOOLS_AVAILABLE, get_api_key
+from config.settings import LLM_MODEL, LLM_BASE_URL, TOOLS_AVAILABLE, LLM_API_KEY
 from fang.agent.prompt.agent_prompt import PLANNER_PROMPT
 from fang.utils.json_cleaner import cleanJson
 from fang.utils.llm_provider import LLM
-
+from fang.memory.storage import API_KEY_CACHED
 
 class Planner:
 
@@ -25,7 +25,7 @@ class Planner:
         llm = LLM(
             model=LLM_MODEL,
             api_base_url=LLM_BASE_URL,
-            api_key=get_api_key(),     
+            api_key= API_KEY_CACHED[0] if API_KEY_CACHED else LLM_API_KEY,
         )
 
         response = llm.invoke(prompt)
