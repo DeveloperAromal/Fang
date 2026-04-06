@@ -96,6 +96,13 @@ chmod +x fang.sh
 ./fang.sh
 ```
 
+#### For configuration reset
+
+```bash
+chmod +x reset.sh
+./reset.sh
+```
+
 ```
 > scan example.com for subdomains and open ports
 > scan https://target.com for technologies and vulnerabilities
