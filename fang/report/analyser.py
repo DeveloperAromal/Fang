@@ -1,5 +1,5 @@
 import json
-from config.settings import  LLM_BASE_URL, LLM_MODEL, LLM_API_KEY
+from config.settings import  LLM_BASE_URL, LLM_MODEL,LLM_API_KEY
 from fang.agent.prompt.agent_prompt import ANALYZER_PROMPT
 from fang.utils.logger import Logger
 from fang.utils.json_cleaner import cleanJson
