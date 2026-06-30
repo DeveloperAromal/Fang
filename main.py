@@ -18,7 +18,7 @@ while True:
 
     print()
 
-    p = PromptUser("[#Fang] > ").collect()
+    p = PromptUser("┌──(#--fang shell--#)-[~]\n└─# fang> ").collect()
 
     if p.lower() in ("exit", "quit", "q"):
         break
